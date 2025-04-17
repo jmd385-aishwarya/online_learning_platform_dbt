@@ -1,31 +1,32 @@
-with reference as (
-    select 
+WITH reference AS (
+    SELECT 
         *
-    from 
+    FROM 
         {{ ref('stg_transactions') }}
 ),
 
-last_transaction as (
-    select 
+last_transaction AS (
+    SELECT 
         customer_id, 
-        max(payment_month) as last_payment_month
-    from reference
-    group by customer_id
+        MAX(TO_DATE(payment_month, 'DD-MM-YYYY')) AS last_payment_month
+    FROM reference
+    GROUP BY customer_id
 ),
 
-churned_customers as (
-    select 
+churned_customers AS (
+    SELECT 
         customer_id,
         last_payment_month,
-        month(last_payment_month) as churn_month,
-        year(last_payment_month) as churn_year
-    from last_transaction
-    where last_payment_month < dateadd('month', -1, current_date)
+        MONTH(last_payment_month) AS churn_month,
+        YEAR(last_payment_month) AS churn_year
+    FROM last_transaction
+    WHERE last_payment_month < DATEADD('month', -1, '2020-07-01')
 )
-select 
+
+SELECT 
     churn_year,
     churn_month,
-    count(customer_id) as churned_customers_count
-from churned_customers
-group by churn_year, churn_month
-order by churn_year, churn_month
+    COUNT(customer_id) AS churned_customers_count
+FROM churned_customers
+GROUP BY churn_year, churn_month
+ORDER BY churn_year, churn_month

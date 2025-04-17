@@ -1,8 +1,8 @@
-select
-	year(payment_month) as fiscal_year,
-	month(payment_month) as fiscal_month,
-	sum(revenue) as mrr
-from {{ ref('stg_transactions') }}
-where customer_id is not null
-group by year(payment_month), month(payment_month)
-order by fiscal_year asc, fiscal_month asc
+SELECT
+    YEAR(TO_DATE(payment_month, 'DD-MM-YYYY')) AS fiscal_year,
+    MONTH(TO_DATE(payment_month, 'DD-MM-YYYY')) AS fiscal_month,
+    SUM(revenue) AS mrr
+FROM {{ ref('stg_transactions') }}
+WHERE customer_id IS NOT NULL
+GROUP BY fiscal_year, fiscal_month
+ORDER BY fiscal_year ASC, fiscal_month ASC
