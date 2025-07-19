@@ -37,6 +37,7 @@ models:
 
     staging:
       + schema: staging
+      + materialized: table
     
     transform:
       + schema: transform
